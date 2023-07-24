@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alertscollector
+  name: alertscollector
+  namespace: dmwm
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: alertscollector
+        volumeMounts:
+        - name: logs-cephfs
+          mountPath: /data/srv/logs/alertscollector
