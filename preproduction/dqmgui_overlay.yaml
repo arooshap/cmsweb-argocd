@@ -18,7 +18,7 @@ spec:
           mountPath: /data/srv/logs/dqmgui
         - name: dqmgui-storage
           persistentVolumeClaim:
-            claimName: dqmgui-claim
+            claimName: dqmgui-claim-preprod
         - name: logs-cephfs
           persistentVolumeClaim:
-            claimName: logs-cephfs-claim-dqm
+            claimName: logs-cephfs-claim-preprod-dqm

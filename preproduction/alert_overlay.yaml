@@ -6,7 +6,6 @@ metadata:
   name: alertscollector
   namespace: dmwm
 spec:
-  replicas: 3
   template:
     spec:
       containers:
@@ -14,3 +13,6 @@ spec:
         volumeMounts:
         - name: logs-cephfs
           mountPath: /data/srv/logs/alertscollector
+      - name: logs-cephfs
+        persistentVolumeClaim:
+          claimName: logs-cephfs-claim-preprod-dmwm

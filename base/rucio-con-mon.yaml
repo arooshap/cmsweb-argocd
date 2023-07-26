@@ -34,13 +34,7 @@ spec:
             cpu: "1000m"
         ports:
         - containerPort: 8400
-   volumeMounts:
-       - mountPath: /reports
-         name: consistency-reports
- volumes:
-   - name: consistency-reports
-     persistentVolumeClaim:
-           claimName: consistency-report-pvc
+
 ---
 kind: Service
 apiVersion: v1

@@ -37,3 +37,13 @@ resources:
 - reqmgr2ms-unmerged-t2t3us.yaml
 - reqmon-tasks.yaml
 - reqmon.yaml
+- rucio-con-mon.yaml
+- rucio-tracer.yaml
+- runregistry.yaml
+- t0_reqmon-tasks.yaml
+- t0_reqmon.yaml
+- t0wmadatasvc.yaml
+- wmarchive.yaml
+- wmstats.yaml
+- workqueue-tasks.yaml
+- x509-proxy-server.yaml

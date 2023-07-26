@@ -62,6 +62,6 @@ spec:
   - name: config
     configMap:
       defaultMode: 0640
-      name: ms-unmer-t2t3-filebeat-config
+      name: ms-unmer-t1-filebeat-config
   - name: data
     emptyDir: {}

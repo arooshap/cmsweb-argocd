@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -5,24 +6,24 @@ metadata:
   namespace: dbs
   labels:
     k8s-app: filebeat
-  data:
-    filebeat.yml: |-
-      filebeat.inputs:
-      - type: log
-        enabled: true
-        paths:
-          - /data/srv/logs/dbs/*${MY_POD_NAME}*
-        ignore_older: 1h
-        scan_frequency: 10s
-        backoff: 5s
-        max_backoff: 10s
-      output.console:
-        codec.format:
-          string: '%{[message]} - Podname=${MY_POD_NAME}'
-          pretty: false
-      queue.mem:
-        events: 65536
-      logging.metrics.enabled: false
+data:
+  filebeat.yml: |-
+    filebeat.inputs:
+    - type: log
+      enabled: true
+      paths:
+        - /data/srv/logs/dbs/*${MY_POD_NAME}*
+      ignore_older: 1h
+      scan_frequency: 10s
+      backoff: 5s
+      max_backoff: 10s
+    output.console:
+      codec.format:
+        string: '%{[message]} - Podname=${MY_POD_NAME}'
+        pretty: false
+    queue.mem:
+      events: 65536
+    logging.metrics.enabled: false
 ---
 kind: Service
 apiVersion: v1
@@ -33,9 +34,9 @@ spec:
   selector:
     app: dbs2go-phys03-w
   ports:
-  - port: 9255
-    targetPort: 9255
-    name: dbs
+    - port: 9255
+      targetPort: 9255
+      name: dbs
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -48,7 +49,7 @@ spec:
   selector:
     matchLabels:
       app: dbs2go-phys03-w
-  replicas: 1
+  replicas: 1 
   template:
     metadata:
       labels:
@@ -69,12 +70,12 @@ spec:
         name: dbs2go-phys03-w
         imagePullPolicy: Always
         env:
-          - name: X509_USER_PROXY
-            value: /etc/proxy/proxy
-          - name: TNS_ADMIN
-            value: /etc/tnsnames.ora
+        - name: X509_USER_PROXY
+          value: /etc/proxy/proxy
+        - name: TNS_ADMIN
+          value: /etc/tnsnames.ora          
         command:
-          - /data/run.sh
+        - /data/run.sh
         resources:
           requests:
             memory: "100Mi"
@@ -96,7 +97,7 @@ spec:
           protocol: TCP
           name: dbs
           command:
-           - /data/run.sh
+        - /data/run.sh
         volumeMounts:
         - name: proxy-secrets
           mountPath: /etc/proxy
@@ -115,7 +116,7 @@ spec:
           readOnly: true
         - name: tnsnames
           mountPath: /etc/tnsnames.ora
-          subPath: tnsnames.ora
+          subPath: tnsnames.ora          
 
         securityContext:
           allowPrivilegeEscalation: false
@@ -138,4 +139,5 @@ spec:
           name: tnsnames-config
       - name: token-secrets
         secret:
-          secretName: token-secrets
+          secretName: token-secrets          
+

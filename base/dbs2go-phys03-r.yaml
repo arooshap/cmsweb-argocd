@@ -69,12 +69,12 @@ spec:
         name: dbs2go-phys03-r
         imagePullPolicy: Always
         env:
-          - name: X509_USER_PROXY
-            value: /etc/proxy/proxy
-          - name: TNS_ADMIN
-            value: /etc/tnsnames.ora
+        - name: X509_USER_PROXY
+          value: /etc/proxy/proxy
+        - name: TNS_ADMIN
+          value: /etc/tnsnames.ora
         command:
-            - /data/run.sh
+        - /data/run.sh
         resources:
           requests:
             memory: "100Mi"
@@ -96,7 +96,7 @@ spec:
           protocol: TCP
           name: dbs
           command:
-            - /data/run.sh
+        - /data/run.sh
         volumeMounts:
         - name: proxy-secrets
           mountPath: /etc/proxy
@@ -139,4 +139,3 @@ spec:
       - name: token-secrets
         secret:
           secretName: token-secrets
-

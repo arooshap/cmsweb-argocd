@@ -46,7 +46,7 @@ spec:
 
     - name: logs
       persistentVolumeClaim:
-          claimName: logs-cephfs-claim-dbs
+          claimName: logs-cephfs-claim-preprod-dbs
     - name: varlog
       hostPath:
         path: /var/log
