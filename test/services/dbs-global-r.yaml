@@ -1,11 +1,10 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: dbs-global-r-filebeat-config
   namespace: dbs
-  labels: 
-   k8s-app: filebeat
+  labels:
+    k8s-app: filebeat
 data:
   filebeat.yml: |-
     filebeat.inputs:
@@ -34,9 +33,9 @@ spec:
   selector:
     app: dbs-global-r
   ports:
-    - port: 8252
-      targetPort: 8252
-      name: dbs-global-r
+  - port: 8252
+    targetPort: 8252
+    name: dbs-global-r
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -66,7 +65,7 @@ spec:
   selector:
     matchLabels:
       app: dbs-global-r
-  replicas: 1   
+  replicas: 1
   template:
     metadata:
       labels:
@@ -76,7 +75,7 @@ spec:
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/port: "18252"
-#         prometheus.io/port: "19252"
+    #         prometheus.io/port: "19252"
     spec:
       securityContext:
         runAsUser: 1000
@@ -96,21 +95,7 @@ spec:
         exec:
           command:
             exec:
-             command:
-              - cmsweb-ping
-              - "--url=http://localhost:8252/dbs/prod/global/DBSReader/"
-              - "--authz=/etc/hmac/hmac"
-              - -verbose 
-              - "0"
-            initialDelaySeconds: 60
-            periodSeconds: 20
-            failureThreshold: 3
-            timeoutSeconds: 10
-      readinessProbe:
-        exec:
-         command:
-           exec:
-            command:
+              command:
               - cmsweb-ping
               - "--url=http://localhost:8252/dbs/prod/global/DBSReader/"
               - "--authz=/etc/hmac/hmac"
@@ -120,6 +105,20 @@ spec:
             periodSeconds: 20
             failureThreshold: 3
             timeoutSeconds: 10
+      readinessProbe:
+        exec:
+          command:
+            exec:
+              command:
+              - cmsweb-ping
+              - "--url=http://localhost:8252/dbs/prod/global/DBSReader/"
+              - "--authz=/etc/hmac/hmac"
+              - -verbose
+              - "0"
+              initialDelaySeconds: 60
+              periodSeconds: 20
+              failureThreshold: 3
+              timeoutSeconds: 10
         ports:
         - containerPort: 8252
           protocol: TCP
@@ -153,7 +152,7 @@ spec:
           mountPath: /opt/setup-certs-and-run
         - name: token-secrets
           mountPath: /etc/token
-          readOnly: true          
+          readOnly: true
 
         securityContext:
           privileged: true
@@ -164,7 +163,7 @@ spec:
           secretName: proxy-secrets
       - name: secrets
         secret:
-            secretName: dbs-global-r-secrets
+          secretName: dbs-global-r-secrets
       - name: robot-secrets
         secret:
           secretName: robot-secrets
@@ -173,11 +172,11 @@ spec:
           secretName: hmac-secrets
       - name: etc-grid-security
         hostPath:
-            path: /etc/grid-security
+          path: /etc/grid-security
       - name: setup-certs-and-run
         configMap:
           name: dbs-global-r
       - name: token-secrets
         secret:
-          secretName: token-secrets          
- 
+          secretName: token-secrets
+
