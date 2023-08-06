@@ -70,13 +70,7 @@ spec:
       containers:
       - image: registry.cern.ch/cmsweb/reqmgr2 #imagetag
         name: reqmgr2-tasks
-   resources:
-     requests:
-       memory: "1Gi"
-       cpu: "400m"
-     limits:
-       memory: "5Gi"
-       cpu: "1000m"
+
         livenessProbe:
           exec:
             command:
@@ -113,42 +107,10 @@ spec:
         - name: token-secrets
           mountPath: /etc/token
           readOnly: true          
-   - name: logs
-     mountPath: /data/srv/logs/reqmgr2
+
         securityContext:
           privileged: true
- - name: reqmgr2-tasks-filebeat
-   image: docker.elastic.co/beats/filebeat:7.12.0
-   args: [
-     "-c", "/etc/filebeat.yml",
-     "-e",
-   ]
-   env:
-   - name: MY_POD_NAME
-     valueFrom:
-       fieldRef:
-         apiVersion: v1
-         fieldPath: metadata.name
-   resources:
-     requests:
-       memory: "50Mi"
-       cpu: "50m"
-   volumeMounts:
-   - name: logs
-     mountPath: /data/srv/logs/reqmgr2
-   - name: config
-     mountPath: /etc/filebeat.yml
-     readOnly: true
-     subPath: filebeat.yml
-   - name: data
-     mountPath: /usr/share/filebeat/data
-   - name: varlog
-     mountPath: /var/log
-   - name: varlibdockercontainers
-     mountPath: /var/lib/docker/containers
-     readOnly: true
-   securityContext:
-     allowPrivilegeEscalation: false
+
 #      initContainers:
 #      - name: checkcouchdb
 #        image: busybox:1.28
@@ -175,18 +137,4 @@ spec:
       - name: token-secrets
         secret:
           secretName: token-secrets          
- - name: logs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-dmwm
- - name: varlog
-   hostPath:
-     path: /var/log
- - name: varlibdockercontainers
-   hostPath:
-     path: /var/lib/docker/containers
- - name: config
-   configMap:
-     defaultMode: 0640
-     name: reqmgr2-tasks-filebeat-config
- - name: data
-   emptyDir: {}
+

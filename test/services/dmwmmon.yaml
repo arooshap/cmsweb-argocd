@@ -75,8 +75,7 @@ spec:
           readOnly: true
         - name: setup-certs-and-run
           mountPath: /opt/setup-certs-and-run
-   - name: logs-cephfs
-     mountPath: /data/srv/logs/dmwmmon
+
         securityContext:
           privileged: true
       volumes:
@@ -100,6 +99,4 @@ spec:
       - name: setup-certs-and-run
         configMap:
           name: dmwmmon
- - name: logs-cephfs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-dmwm
+

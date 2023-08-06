@@ -108,8 +108,7 @@ spec:
           mountPath: /tmp/krb
         - mountPath: /cvmfs/cms.cern.ch
           name: cms-pvc                    
-   - name: logs
-     mountPath: /home/cmsusr/dqmgui
+
         securityContext:
           privileged: true
       volumes:
@@ -147,7 +146,5 @@ spec:
         persistentVolumeClaim:
           claimName: csi-cvmfs-cms-pvc
           readOnly: true
- - name: logs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-dqm
+
 

@@ -103,10 +103,7 @@ spec:
           readOnly: true
         - name: setup-certs-and-run
           mountPath: /opt/setup-certs-and-run
-   - name: dqmgui-storage
-     mountPath: /data/srv/state/dqmgui/data
-   - name: logs-cephfs
-     mountPath: /data/srv/logs/dqmgui
+
         securityContext:
           privileged: true
       volumes:
@@ -122,9 +119,4 @@ spec:
       - name: setup-certs-and-run
         configMap:
           name: dqmgui
- - name: dqmgui-storage
-   persistentVolumeClaim:
-       claimName: dqmgui-claim
- - name: logs-cephfs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-dqm
+

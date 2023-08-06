@@ -59,12 +59,8 @@ spec:
         - name: secrets
           mountPath: /etc/secrets
           readOnly: true
-   - name: ms-output-mongo-data
-     mountPath: /data/mongodb
+
       volumes:
       - name: secrets
         secret:
           secretName: ms-output-mongo-secrets
- - name: ms-output-mongo-data
-   persistentVolumeClaim:
-       claimName: ms-output-claim

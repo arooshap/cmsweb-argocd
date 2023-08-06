@@ -1,4 +1,3 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -36,9 +35,9 @@ spec:
   selector:
     app: wmarchive
   ports:
-    - port: 8200
-      targetPort: 8200
-      name: wma
+  - port: 8200
+    targetPort: 8200
+    name: wma
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -49,14 +48,14 @@ metadata:
   namespace: wma
 data:
   setup-certs-and-run.sh: |
-   #!/bin/sh
-   sudo mkdir -p /etc/grid-security
-   sudo cp /host/etc/grid-security/* /etc/grid-security
-   echo 'INFO Files in /etc/grid-security'
-   ls -lah /etc/grid-security
-   #su  -c "cd /data && /data/run.sh" --preserve-environment _wmarchive
-   sudo chown -R wmarchive:wmarchive /data/srv/logs/wmarchive
-   cd /data && /data/run.sh
+    #!/bin/sh
+    sudo mkdir -p /etc/grid-security
+    sudo cp /host/etc/grid-security/* /etc/grid-security
+    echo 'INFO Files in /etc/grid-security'
+    ls -lah /etc/grid-security
+    #su  -c "cd /data && /data/run.sh" --preserve-environment _wmarchive
+    sudo chown -R wmarchive:wmarchive /data/srv/logs/wmarchive
+    cd /data && /data/run.sh
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -69,7 +68,7 @@ spec:
   selector:
     matchLabels:
       app: wmarchive
-  replicas: 1   
+  replicas: 1
   template:
     metadata:
       labels:
@@ -123,43 +122,11 @@ spec:
           mountPath: /opt/setup-certs-and-run
         - name: token-secrets
           mountPath: /etc/token
-          readOnly: true          
-   - name: logs
-     mountPath: /data/srv/logs/wmarchive
+          readOnly: true
+
         securityContext:
           privileged: true
- - name: wmarchive-filebeat
-   image: docker.elastic.co/beats/filebeat:7.12.0
-   args: [
-     "-c", "/etc/filebeat.yml",
-     "-e",
-   ]
-   env:
-   - name: MY_POD_NAME
-     valueFrom:
-       fieldRef:
-         apiVersion: v1
-         fieldPath: metadata.name
-   resources:
-     requests:
-       memory: "50Mi"
-       cpu: "50m"
-   volumeMounts:
-   - name: logs
-     mountPath: /data/srv/logs/wmarchive
-   - name: config
-     mountPath: /etc/filebeat.yml
-     readOnly: true
-     subPath: filebeat.yml
-   - name: data
-     mountPath: /usr/share/filebeat/data
-   - name: varlog
-     mountPath: /var/log
-   - name: varlibdockercontainers
-     mountPath: /var/lib/docker/containers
-     readOnly: true
-   securityContext:
-     allowPrivilegeEscalation: false
+
       volumes:
       - name: proxy-secrets
         secret:
@@ -175,19 +142,5 @@ spec:
           name: wmarchive
       - name: token-secrets
         secret:
-          secretName: token-secrets          
- - name: logs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-wma
- - name: varlog
-   hostPath:
-     path: /var/log
- - name: varlibdockercontainers
-   hostPath:
-     path: /var/lib/docker/containers
- - name: config
-   configMap:
-     defaultMode: 0640
-     name: wmarchive-filebeat-config
- - name: data
-   emptyDir: {}
+          secretName: token-secrets
+

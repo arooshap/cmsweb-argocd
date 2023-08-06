@@ -12,7 +12,7 @@ data:
     echo 'INFO Files in /etc/grid-security'
     ls -lahZ /etc/grid-security
     su  -c "cd /data && /data/run.sh" --preserve-environment _workqueue
----    
+---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -30,10 +30,10 @@ spec:
       labels:
         app: workqueue-tasks
         env: k8s #k8s#
-# should be enabled once we'll have exporter running with this sercice
-# we should also add prometheus.io/port in that case
-#       annotations:
-#         prometheus.io/scrape: 'true'
+    # should be enabled once we'll have exporter running with this sercice
+    # we should also add prometheus.io/port in that case
+    #       annotations:
+    #         prometheus.io/scrape: 'true'
     spec:
       securityContext:
         runAsUser: 0
@@ -69,14 +69,13 @@ spec:
           readOnly: true
         - name: setup-certs-and-run
           mountPath: /opt/setup-certs-and-run
-   - name: logs-cephfs
-     mountPath: /data/srv/logs/workqueue
+
         securityContext:
           privileged: true
-#      initContainers:
-#      - name: checkcouchdb
-#        image: busybox:1.28
-#        command: ['sh', '-c', 'until nslookup couchdb.couchdb; do echo "Waiting for couchdb"; sleep 10; done;']
+      #      initContainers:
+      #      - name: checkcouchdb
+      #        image: busybox:1.28
+      #        command: ['sh', '-c', 'until nslookup couchdb.couchdb; do echo "Waiting for couchdb"; sleep 10; done;']
       volumes:
       - name: proxy-secrets
         secret:
@@ -96,6 +95,4 @@ spec:
       - name: setup-certs-and-run
         configMap:
           name: workqueue-tasks
- - name: logs-cephfs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-dmwm
+

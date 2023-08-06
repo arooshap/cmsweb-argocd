@@ -98,60 +98,26 @@ spec:
         - containerPort: 19257
           protocol: TCP
           name: dbs-mon
-        command:
+      command:
         - /data/run.sh
-        volumeMounts:
-        - name: proxy-secrets
-          mountPath: /etc/proxy
-          readOnly: true
-        - name: secrets
-          mountPath: /etc/secrets
-          readOnly: true
-        - name: robot-secrets
-          mountPath: /etc/robots
-          readOnly: true
-        - name: hmac-secrets
-          mountPath: /etc/hmac
-          readOnly: true
-        - name: tnsnames
-          mountPath: /etc/tnsnames.ora
-          subPath: tnsnames.ora
-   - name: logs
-     mountPath: /data/srv/logs/dbs
-        securityContext:
-          allowPrivilegeEscalation: false
- - name: dbs2go-global-m-filebeat
-   image: docker.elastic.co/beats/filebeat:7.12.0
-   args: [
-     "-c", "/etc/filebeat.yml",
-     "-e",
-   ]
-   env:
-   - name: MY_POD_NAME
-     valueFrom:
-       fieldRef:
-         apiVersion: v1
-         fieldPath: metadata.name
-   resources:
-     requests:
-       memory: "50Mi"
-       cpu: "50m"
-   volumeMounts:
-   - name: logs
-     mountPath: /data/srv/logs/dbs
-   - name: config
-     mountPath: /etc/filebeat.yml
-     readOnly: true
-     subPath: filebeat.yml
-   - name: data
-     mountPath: /usr/share/filebeat/data
-   - name: varlog
-     mountPath: /var/log
-   - name: varlibdockercontainers
-     mountPath: /var/lib/docker/containers
-     readOnly: true
-   securityContext:
-     allowPrivilegeEscalation: false
+      volumeMounts:
+      - name: proxy-secrets
+        mountPath: /etc/proxy
+        readOnly: true
+      - name: secrets
+        mountPath: /etc/secrets
+        readOnly: true
+      - name: robot-secrets
+        mountPath: /etc/robots
+        readOnly: true
+      - name: hmac-secrets
+        mountPath: /etc/hmac
+        readOnly: true
+      - name: tnsnames
+        mountPath: /etc/tnsnames.ora
+        subPath: tnsnames.ora
+
+
       volumes:
       - name: proxy-secrets
         secret:
@@ -168,18 +134,4 @@ spec:
       - name: tnsnames
         configMap:
           name: tnsnames-config
- - name: logs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-dbs
- - name: varlog
-   hostPath:
-     path: /var/log
- - name: varlibdockercontainers
-   hostPath:
-     path: /var/lib/docker/containers
- - name: config
-   configMap:
-     defaultMode: 0640
-     name: dbs2go-global-m-filebeat-config
- - name: data
-   emptyDir: {}
+

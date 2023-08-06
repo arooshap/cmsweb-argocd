@@ -22,19 +22,17 @@ spec:
         - /bin/sh
         - -c
         - >
-            i=0;
-            while true;
-            do
-                echo "$i: $(date)" >> /var/log/1.log;
-                echo "$(date) INFO $i" >> /var/log/2.log;
-                i=$((i+1));
-                sleep 60;
-            done
+          i=0; while true; do
+              echo "$i: $(date)" >> /var/log/1.log;
+              echo "$(date) INFO $i" >> /var/log/2.log;
+              i=$((i+1));
+              sleep 60;
+          done
         volumeMounts:
         - name: varlog
           mountPath: /var/log
       - image: veknet/promtail
-        name: promtail 
+        name: promtail
         args:
         - /data/promtail
         - -config.file

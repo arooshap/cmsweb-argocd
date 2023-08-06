@@ -99,8 +99,7 @@ spec:
           mountPath: /etc/grid-security/hostcert.pem
         - name: hostkey
           mountPath: /etc/grid-security/hostkey.pem
-   - name: logs-cephfs
-     mountPath: /data/srv/logs/frontend
+
       volumes:
       - name: proxy-secrets
         secret:
@@ -117,6 +116,3 @@ spec:
       - name: hostkey
         hostPath:
             path: /etc/grid-security/hostkey.pem
- - name: logs-cephfs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-default

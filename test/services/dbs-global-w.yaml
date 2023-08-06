@@ -1,10 +1,11 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: dbs-global-w-filebeat-config
   namespace: dbs
-  labels:
-    k8s-app: filebeat
+  labels: 
+   k8s-app: filebeat
 data:
   filebeat.yml: |-
     filebeat.inputs:
@@ -47,12 +48,13 @@ metadata:
 data:
   setup-certs-and-run.sh: |
     #!/bin/bash
+
     sudo cp /host/etc/grid-security/* /etc/grid-security
     echo 'INFO Files in /etc/grid-security'
     ls -lahZ /etc/grid-security
     #su  -c "cd /data && /data/run.sh" --preserve-environment _dbs
-    cd /data && /data/run.sh     
----    
+    cd /data && /data/run.sh
+---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -82,23 +84,25 @@ spec:
         fsGroup: 2000
       containers:
       - image: registry.cern.ch/cmsweb/dbs #imagetag
-        name: dbs-global-w
+        name: dbs-global-r
         resources:
           requests:
-            memory: "500Mi"
+            memory: "1000Mi"
             cpu: "300m"
           limits:
-            memory: "10Gi"
+            memory: "15Gi"
             cpu: "2000m"
         livenessProbe:
-          exec:
-            command:
-            - cmsweb-ping
-            - "--url=http://localhost:8253/dbs/prod/global/DBSWriter/"
-            - "--authz=/etc/hmac/hmac"
-            - -verbose
-            - "0"
-          initialDelaySeconds: 120
+        exec:
+          command:
+            exec:
+             command:
+              - cmsweb-ping
+              - "--url=http://localhost:8253/dbs/prod/global/DBSWriter/"
+              - "--authz=/etc/hmac/hmac"
+              - -verbose 
+              - "0"
+            initialDelaySeconds: 120
           periodSeconds: 10
         ports:
         - containerPort: 8253
@@ -134,42 +138,10 @@ spec:
         - name: token-secrets
           mountPath: /etc/token
           readOnly: true          
-   - name: logs
-     mountPath: /data/srv/logs/dbs
+
         securityContext:
           privileged: true
- - name: dbs-global-w-filebeat
-   image: docker.elastic.co/beats/filebeat:7.12.0
-   args: [
-     "-c", "/etc/filebeat.yml",
-     "-e",
-   ]
-   env:
-   - name: MY_POD_NAME
-     valueFrom:
-       fieldRef:
-         apiVersion: v1
-         fieldPath: metadata.name
-   resources:
-     requests:
-       memory: "50Mi"
-       cpu: "50m"
-   volumeMounts:
-   - name: logs
-     mountPath: /data/srv/logs/dbs
-   - name: config
-     mountPath: /etc/filebeat.yml
-     readOnly: true
-     subPath: filebeat.yml
-   - name: data
-     mountPath: /usr/share/filebeat/data
-   - name: varlog
-     mountPath: /var/log
-   - name: varlibdockercontainers
-     mountPath: /var/lib/docker/containers
-     readOnly: true
-   securityContext:
-     allowPrivilegeEscalation: false
+          
       volumes:
       - name: proxy-secrets
         secret:
@@ -192,18 +164,3 @@ spec:
       - name: token-secrets
         secret:
           secretName: token-secrets          
- - name: logs
-   persistentVolumeClaim:
-       claimName: logs-cephfs-claim-dbs
- - name: varlog
-   hostPath:
-     path: /var/log
- - name: varlibdockercontainers
-   hostPath:
-     path: /var/lib/docker/containers
- - name: config
-   configMap:
-     defaultMode: 0640
-     name: dbs-global-w-filebeat-config
- - name: data
-   emptyDir: {}
