@@ -44,11 +44,11 @@ spec:
           - -config=/etc/secrets/config.json
         resources:
           requests:
-            memory: "256Mi"
             cpu: "300m"
+              memory: "256Mi"
           limits:
-            memory: "3Gi"
             cpu: "8000m"
+              memory: "3Gi"
         ports:
         - containerPort: 8181
           name: https
