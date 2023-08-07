@@ -95,7 +95,7 @@ spec:
         - containerPort: 9252
           protocol: TCP
           name: dbs
-          command:
+        command:
         - /data/run.sh
         volumeMounts:
         - name: proxy-secrets
@@ -117,6 +117,7 @@ spec:
           mountPath: /etc/tnsnames.ora
           subPath: tnsnames.ora
 
+        securityContext:
           allowPrivilegeEscalation: false
 
       volumes:
