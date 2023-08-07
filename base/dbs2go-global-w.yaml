@@ -95,7 +95,7 @@ spec:
         - containerPort: 9253
           protocol: TCP
           name: dbs
-          command:
+        command:
         - /data/run.sh
         volumeMounts:
         - name: proxy-secrets
@@ -139,4 +139,3 @@ spec:
       - name: token-secrets
         secret:
           secretName: token-secrets
-
