@@ -1,4 +1,3 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -34,9 +33,9 @@ spec:
   selector:
     app: dbs2go-global-m
   ports:
-    - port: 9257
-      targetPort: 9257
-      name: dbs
+  - port: 9257
+    targetPort: 9257
+    name: dbs
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -49,7 +48,7 @@ spec:
   selector:
     matchLabels:
       app: dbs2go-global-m
-  replicas: 1   
+  replicas: 1
   template:
     metadata:
       labels:
@@ -98,25 +97,27 @@ spec:
         - containerPort: 19257
           protocol: TCP
           name: dbs-mon
-      command:
+        command:
         - /data/run.sh
-      volumeMounts:
-      - name: proxy-secrets
-        mountPath: /etc/proxy
-        readOnly: true
-      - name: secrets
-        mountPath: /etc/secrets
-        readOnly: true
-      - name: robot-secrets
-        mountPath: /etc/robots
-        readOnly: true
-      - name: hmac-secrets
-        mountPath: /etc/hmac
-        readOnly: true
-      - name: tnsnames
-        mountPath: /etc/tnsnames.ora
-        subPath: tnsnames.ora
+        volumeMounts:
+        - name: proxy-secrets
+          mountPath: /etc/proxy
+          readOnly: true
+        - name: secrets
+          mountPath: /etc/secrets
+          readOnly: true
+        - name: robot-secrets
+          mountPath: /etc/robots
+          readOnly: true
+        - name: hmac-secrets
+          mountPath: /etc/hmac
+          readOnly: true
+        - name: tnsnames
+          mountPath: /etc/tnsnames.ora
+          subPath: tnsnames.ora
 
+        securityContext:
+          allowPrivilegeEscalation: false
 
       volumes:
       - name: proxy-secrets
@@ -134,4 +135,3 @@ spec:
       - name: tnsnames
         configMap:
           name: tnsnames-config
-

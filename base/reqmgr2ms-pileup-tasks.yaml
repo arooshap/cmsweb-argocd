@@ -142,6 +142,7 @@ spec:
         securityContext:
           privileged: true
 
+      volumes:
       - name: rucio-secrets
         secret:
           secretName: rucio-secrets

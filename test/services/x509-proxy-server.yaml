@@ -56,7 +56,7 @@ spec:
         volumeMounts:
         - name: auth-secrets
           mountPath: /etc/secrets
-          defaultMode: 256
+          # defaultMode: 256
         - name: www-htdocs
           mountPath: /www
       initContainers:

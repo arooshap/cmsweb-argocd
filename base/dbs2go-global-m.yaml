@@ -1,8 +1,7 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dbs2go-global-m-filebeat-config
+  name: dbs-global-w-filebeat-config
   namespace: dbs
   labels:
     k8s-app: filebeat
@@ -12,7 +11,7 @@ data:
     - type: log
       enabled: true
       paths:
-        - /data/srv/logs/dbs/*${MY_POD_NAME}*
+        - /data/srv/logs/dbs/*${MY_POD_NAME}*.log
       ignore_older: 1h
       scan_frequency: 10s
       backoff: 5s
@@ -28,110 +27,130 @@ data:
 kind: Service
 apiVersion: v1
 metadata:
-  name: dbs2go-global-m
+  name: dbs-global-w
   namespace: dbs
 spec:
   selector:
-    app: dbs2go-global-m
+    app: dbs-global-w
   ports:
-    - port: 9257
-      targetPort: 9257
-      name: dbs
+  - port: 8253
+    targetPort: 8253
+    name: dbs-global-w
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dbs-global-w
+  labels:
+    app: dbs-global-w
+  namespace: dbs
+data:
+  setup-certs-and-run.sh: "#!/bin/bash\nsudo cp /host/etc/grid-security/* /etc/grid-security\necho 'INFO Files in /etc/grid-security'\nls -lahZ /etc/grid-security\n#su  -c \"cd /data && /data/run.sh\" --preserve-environment _dbs\ncd /data && /data/run.sh     \n"
 ---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   labels:
-    app: dbs2go-global-m
-  name: dbs2go-global-m
+    app: dbs-global-w
+  name: dbs-global-w
   namespace: dbs
 spec:
   selector:
     matchLabels:
-      app: dbs2go-global-m
-  replicas: 1   
+      app: dbs-global-w
+  replicas: 1
   template:
     metadata:
       labels:
-        app: dbs2go-global-m
+        app: dbs-global-w
         env: k8s #k8s#
+        job: dbs-global-w
       annotations:
         prometheus.io/scrape: 'true'
-        prometheus.io/path: "/dbs/prod/global/DBSMigrate/metrics"
-        prometheus.io/port: "9257"
+        prometheus.io/port: "18253"
+    #         prometheus.io/port: "19253"
     spec:
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 2000
       containers:
-      - image: registry.cern.ch/cmsweb/dbs2go #imagetag
-        name: dbs2go-global-m
-        imagePullPolicy: Always
-        env:
-        - name: X509_USER_PROXY
-          value: /etc/proxy/proxy
-        - name: TNS_ADMIN
-          value: /etc/tnsnames.ora
-        command:
-        - /data/run.sh
+      - image: registry.cern.ch/cmsweb/dbs #imagetag
+        name: dbs-global-w
         resources:
           requests:
-            memory: "100Mi"
-            cpu: "200m"
-          limits:
             memory: "500Mi"
-            cpu: "3000m"
+            cpu: "300m"
+          limits:
+            memory: "10Gi"
+            cpu: "2000m"
         livenessProbe:
-          httpGet:
-            path: /dbs/prod/global/DBSMigrate/healthz
-            port: 9257
-            httpHeaders:
-            - name: Accept
-              value: application/json
+          exec:
+            command:
+            - cmsweb-ping
+            - "--url=http://localhost:8253/dbs/prod/global/DBSWriter/"
+            - "--authz=/etc/hmac/hmac"
+            - -verbose
+            - "0"
           initialDelaySeconds: 120
           periodSeconds: 10
         ports:
-        - containerPort: 9257
+        - containerPort: 8253
           protocol: TCP
-          name: dbs
-        - containerPort: 19257
+          name: dbs-global-w
+        - containerPort: 18253
           protocol: TCP
-          name: dbs-mon
-      command:
-        - /data/run.sh
-      volumeMounts:
-      - name: proxy-secrets
-        mountPath: /etc/proxy
-        readOnly: true
-      - name: secrets
-        mountPath: /etc/secrets
-        readOnly: true
-      - name: robot-secrets
-        mountPath: /etc/robots
-        readOnly: true
-      - name: hmac-secrets
-        mountPath: /etc/hmac
-        readOnly: true
-      - name: tnsnames
-        mountPath: /etc/tnsnames.ora
-        subPath: tnsnames.ora
+          name: dbs-gw-mon
+        - containerPort: 19253
+          protocol: TCP
+          name: dbs-gw-cpy-mon
+        command:
+        - /bin/bash
+        - /opt/setup-certs-and-run/setup-certs-and-run.sh
+        volumeMounts:
+        - name: proxy-secrets
+          mountPath: /etc/proxy
+          readOnly: true
+        - name: secrets
+          mountPath: /etc/secrets
+          readOnly: true
+        - name: robot-secrets
+          mountPath: /etc/robots
+          readOnly: true
+        - name: hmac-secrets
+          mountPath: /etc/hmac
+          readOnly: true
+        - mountPath: /host/etc/grid-security
+          name: etc-grid-security
+          readOnly: true
+        - name: setup-certs-and-run
+          mountPath: /opt/setup-certs-and-run
+        - name: token-secrets
+          mountPath: /etc/token
+          readOnly: true
 
+        securityContext:
+          privileged: true
 
       volumes:
       - name: proxy-secrets
         secret:
           secretName: proxy-secrets
+      - name: secrets
+        secret:
+          secretName: dbs-global-w-secrets
       - name: robot-secrets
         secret:
           secretName: robot-secrets
       - name: hmac-secrets
         secret:
           secretName: hmac-secrets
-      - name: secrets
-        secret:
-          secretName: dbs2go-global-m-secrets
-      - name: tnsnames
+      - name: etc-grid-security
+        hostPath:
+          path: /etc/grid-security
+      - name: setup-certs-and-run
         configMap:
-          name: tnsnames-config
-
+          name: dbs-global-w
+      - name: token-secrets
+        secret:
+          secretName: token-secrets

@@ -24,25 +24,25 @@ spec:
   selector:
     matchLabels:
       app: x509-proxy-server
-  replicas: 1   
+  replicas: 1
   template:
     metadata:
       labels:
         app: x509-proxy-server
         env: k8s #k8s#
-# should be enabled once we'll have exporter running with this sercice
-# we should also add prometheus.io/port in that case
-#       annotations:
-#         prometheus.io/scrape: 'true'
+    # should be enabled once we'll have exporter running with this sercice
+    # we should also add prometheus.io/port in that case
+    #       annotations:
+    #         prometheus.io/scrape: 'true'
     spec:
       containers:
       - image: registry.cern.ch/cmsweb/auth-proxy-server:20200714-x509
         name: x509-proxy-server
         imagePullPolicy: Always
         args:
-          - /data/auth-proxy-server
-          - -config=/etc/secrets/config.json
-          - -useX509
+        - /data/auth-proxy-server
+        - -config=/etc/secrets/config.json
+        - -useX509
         resources:
           requests:
             memory: "256Mi"
@@ -56,7 +56,7 @@ spec:
         volumeMounts:
         - name: auth-secrets
           mountPath: /etc/secrets
-          defaultMode: 256
+          # defaultMode: 256
         - name: www-htdocs
           mountPath: /www
       initContainers:
