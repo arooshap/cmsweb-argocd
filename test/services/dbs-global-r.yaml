@@ -92,33 +92,29 @@ spec:
             memory: "15Gi"
             cpu: "2000m"
         livenessProbe:
-        exec:
-          command:
-            exec:
-              command:
-              - cmsweb-ping
-              - "--url=http://localhost:8252/dbs/prod/global/DBSReader/"
-              - "--authz=/etc/hmac/hmac"
-              - -verbose
-              - "0"
-            initialDelaySeconds: 60
-            periodSeconds: 20
-            failureThreshold: 3
-            timeoutSeconds: 10
-      readinessProbe:
-        exec:
-          command:
-            exec:
-              command:
-              - cmsweb-ping
-              - "--url=http://localhost:8252/dbs/prod/global/DBSReader/"
-              - "--authz=/etc/hmac/hmac"
-              - -verbose
-              - "0"
-              initialDelaySeconds: 60
-              periodSeconds: 20
-              failureThreshold: 3
-              timeoutSeconds: 10
+          exec:
+            command:
+            - cmsweb-ping
+            - "--url=http://localhost:8252/dbs/prod/global/DBSReader/"
+            - "--authz=/etc/hmac/hmac"
+            - -verbose
+            - "0"
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          failureThreshold: 3
+          timeoutSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - cmsweb-ping
+            - "--url=http://localhost:8252/dbs/prod/global/DBSReader/"
+            - "--authz=/etc/hmac/hmac"
+            - -verbose
+            - "0"
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          failureThreshold: 3
+          timeoutSeconds: 10
         ports:
         - containerPort: 8252
           protocol: TCP
